@@ -96,7 +96,6 @@ public class DeviceService {
     public ListDeviceLogDto getList(int page, int pageSize, Long fromTimestamp, Long toTimestamp, String name, String email,
                                     int temperature, String filterOnly, String sortByTemperature, String sortByDate, String countOnly) {
         List<DeviceLogDto> deviceLogDtoList = new ArrayList<>();
-        System.out.println("filter:" +  filterOnly);
         Pageable paging = getPage(sortByTemperature, sortByDate, page, pageSize);
         Page<DeviceLog> deviceLogPage = null;
         if (filterOnly.equals("N")) {
@@ -123,10 +122,8 @@ public class DeviceService {
                         deviceLogDtoList.add(map.deviceLogDto(deviceLog));
                     }
                     if (countOnly.equals("N")) {
-                        System.out.println("Its there");
                         return new ListDeviceLogDto(deviceLogDtoList);
                     }
-                    System.out.println("Its here");
                     return new ListDeviceLogDto(deviceLogPage.getTotalElements(),deviceLogPage.getTotalPages(), new ArrayList<DeviceLogDto>());
                 }
                 return new ListDeviceLogDto(deviceLogDtoList);
