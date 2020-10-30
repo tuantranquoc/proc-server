@@ -8,7 +8,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.example.demo.dto.device.ListDevice;
+import com.example.demo.dto.device.ListDeviceLogDto;
 import com.example.demo.model.device.Device;
+import com.example.demo.model.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -77,28 +80,71 @@ public class DeviceService {
             return false;
         }
         if (deviceLogSubmitDto.getTemperature() > max_temperature) {
-            List<EmailConfig> listEmail =  emailConfigRepository.findAll();
-            for(EmailConfig list : listEmail) {
-            	String email = list.getEmail();
-            	msg.setTo(email);
+            List<EmailConfig> listEmail = emailConfigRepository.findAll();
+            for (EmailConfig list : listEmail) {
+                String email = list.getEmail();
+                msg.setTo(email);
                 msg.setSubject("Alert Temperature");
-                msg.setText(userRepository.findUserById(deviceLogSubmitDto.getUserId()).getName() 
-                		+ " have current temperature " + deviceLogSubmitDto.getTemperature() + Message.ALERT_TEMPERATURE + " " + max_temperature);
+                msg.setText(userRepository.findUserById(deviceLogSubmitDto.getUserId()).getName()
+                        + " have current temperature " + deviceLogSubmitDto.getTemperature() + Message.ALERT_TEMPERATURE + " " + max_temperature);
                 javaMailSender.send(msg);
             }
         }
         return true;
     }
 
-    public List<DeviceLogDto> getList(int page, int pageSize) {
+    public ListDeviceLogDto getList(int page, int pageSize, Long fromTimestamp, Long toTimestamp, String name, String email,
+                                    int temperature, String filterOnly, String sortByTemperature, String sortByDate, String countOnly) {
         List<DeviceLogDto> deviceLogDtoList = new ArrayList<>();
-        Pageable paging = PageRequest.of(page, pageSize, Sort.by("timestamp").descending());
-        Page<DeviceLog> deviceLogPage = deviceLogRepository.findAll(paging);
-        for (DeviceLog deviceLog :
-                deviceLogPage) {
-            deviceLogDtoList.add(map.deviceLogDto(deviceLog));
+        System.out.println("filter:" +  filterOnly);
+        Pageable paging = getPage(sortByTemperature, sortByDate, page, pageSize);
+        Page<DeviceLog> deviceLogPage = null;
+        if (filterOnly.equals("N")) {
+            assert false;
+            deviceLogPage = deviceLogRepository.findAll(paging);
+        } else {
+            User user = userRepository.findUserByNameAndEmail(name, email);
+            if (user != null) {
+                if (fromTimestamp != 0 && toTimestamp != 0) {
+                    deviceLogPage = deviceLogRepository.findByUserIdAndTemperatureAndTimestampGreaterThanEqualAndTimestampLessThanEqual(user.getId(), temperature, fromTimestamp, toTimestamp, paging);
+                }
+                if (fromTimestamp == 0 || toTimestamp == 0) {
+                    if (temperature == 0) {
+                        deviceLogPage = deviceLogRepository.findByUserId(user.getId(), paging);
+                    } else {
+                        deviceLogPage = deviceLogRepository.findByUserIdAndTemperature(user.getId(), temperature, paging);
+                    }
+                }
+            } else {
+                if (temperature != 0 && (name == null || name.equals("undefined")) && (email == null || email.equals("undefined"))){
+                    deviceLogPage = deviceLogRepository.findByTemperature(temperature,paging);
+                    for (DeviceLog deviceLog :
+                            deviceLogPage) {
+                        deviceLogDtoList.add(map.deviceLogDto(deviceLog));
+                    }
+                    if (countOnly.equals("N")) {
+                        System.out.println("Its there");
+                        return new ListDeviceLogDto(deviceLogDtoList);
+                    }
+                    System.out.println("Its here");
+                    return new ListDeviceLogDto(deviceLogPage.getTotalElements(),deviceLogPage.getTotalPages(), new ArrayList<DeviceLogDto>());
+                }
+                return new ListDeviceLogDto(deviceLogDtoList);
+            }
         }
-        return deviceLogDtoList;
+        if (deviceLogPage != null) {
+            for (DeviceLog deviceLog :
+                    deviceLogPage) {
+                deviceLogDtoList.add(map.deviceLogDto(deviceLog));
+            }
+            if (countOnly.equals("N")) {
+                return new ListDeviceLogDto(deviceLogDtoList);
+            }
+            deviceLogDtoList.clear();
+
+            return new ListDeviceLogDto(deviceLogPage.getTotalElements(),deviceLogPage.getTotalPages(), new ArrayList<DeviceLogDto>());
+        }
+        return new ListDeviceLogDto(deviceLogDtoList);
     }
 
     public Long pastSixMonths() {
@@ -124,8 +170,37 @@ public class DeviceService {
         return userTemperatureList;
     }
 
-    public Page<Device> getListDevice(int page, int pageSize){
+    public ListDevice getListDevice(int page, int pageSize, String countOnly) {
         Pageable paging = PageRequest.of(page, pageSize);
-        return deviceRepository.findAll(paging);
+        List<Device> deviceList = new ArrayList<>();
+        Page<Device> devicePage = deviceRepository.findAll(paging);
+        if (countOnly.equals("N")) {
+            for (Device device : devicePage) {
+                deviceList.add(device);
+            }
+            return new ListDevice(deviceList);
+        }
+        return new ListDevice(devicePage.getTotalElements(),devicePage.getTotalPages(), new ArrayList<Device>());
     }
+
+    public Long countDevice() {
+        return deviceRepository.count();
+    }
+
+    public Pageable getPage(String sortByTemperature, String sortByDate, int page, int pageSize) {
+        if (sortByDate.equals("D")) {
+            return PageRequest.of(page, pageSize, Sort.by("timestamp").descending());
+        }
+        if (sortByDate.equals("A")) {
+            return PageRequest.of(page, pageSize, Sort.by("timestamp").ascending());
+        }
+        if (sortByTemperature.equals("D")) {
+            return PageRequest.of(page, pageSize, Sort.by("temperature").descending());
+        }
+        if (sortByTemperature.equals("A")) {
+            return PageRequest.of(page, pageSize, Sort.by("temperature").ascending());
+        }
+        return PageRequest.of(page, pageSize, Sort.by("timestamp").descending());
+    }
+
 }

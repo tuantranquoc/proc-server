@@ -1,6 +1,7 @@
 package com.example.demo.service.user;
 
 import com.example.demo.dto.Map;
+import com.example.demo.dto.user.ListUserDto;
 import com.example.demo.dto.user.UserDto;
 import com.example.demo.model.user.User;
 import com.example.demo.repository.user.UserRepository;
@@ -21,14 +22,21 @@ public class UserService {
         this.map = map;
     }
 
-    public List<UserDto> getListUser(int page, int pageSize){
+    public ListUserDto getListUser(int page, int pageSize, String countOnly){
         List<UserDto> userList = new ArrayList<>();
         Pageable paging = PageRequest.of(page, pageSize);
         Page<User> users = userRepository.findAll(paging);
-        for (User user :
-                users) {
-            userList.add(map.userDto(user));
+        if (countOnly.equals("N")){
+            for (User user :
+                    users) {
+                userList.add(map.userDto(user));
+            }
+            return new ListUserDto(userList);
         }
-        return userList;
+        return new ListUserDto(users.getTotalElements(),users.getTotalPages(), userList);
+    }
+
+    public Long countUser(){
+        return userRepository.count();
     }
 }

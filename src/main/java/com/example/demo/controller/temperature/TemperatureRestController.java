@@ -1,6 +1,7 @@
 package com.example.demo.controller.temperature;
 
 
+import com.example.demo.dto.temperature.ListEmailConfigDto;
 import com.example.demo.dto.temperature.TemperatureConfigDto;
 import com.example.demo.model.conf.EmailConfig;
 import com.example.demo.service.device.TemperatureConfService;
@@ -42,8 +43,9 @@ public class TemperatureRestController {
     }
 
     @RequestMapping(value = "config/list", method = RequestMethod.GET)
-    public Page<EmailConfig> getList(@RequestParam(name = "page", required = false, defaultValue = "0") int pageIndex,
-                                     @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize) {
-        return temperatureConfService.getListConfigEmail(pageIndex,pageSize);
+    public ListEmailConfigDto getList(@RequestParam(name = "page", required = false, defaultValue = "0") int pageIndex,
+                                      @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize,
+                                      @RequestParam(name = "countOnly", required = false, defaultValue = "N") String countOnly) {
+        return temperatureConfService.getListConfigEmail(pageIndex,pageSize, countOnly);
     }
 }

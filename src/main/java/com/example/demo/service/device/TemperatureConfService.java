@@ -1,10 +1,13 @@
 package com.example.demo.service.device;
 
 import com.example.demo.dto.Map;
+import com.example.demo.dto.temperature.ListEmailConfigDto;
 import com.example.demo.dto.temperature.TemperatureConfigDto;
+import com.example.demo.dto.user.UserDto;
 import com.example.demo.model.conf.EmailConfig;
 import com.example.demo.model.conf.Temperature;
 import com.example.demo.model.device.Device;
+import com.example.demo.model.device.DeviceLog;
 import com.example.demo.repository.conf.EmailConfigRepository;
 import com.example.demo.repository.conf.TemperatureRepository;
 import com.example.demo.repository.device.DeviceLogRepository;
@@ -12,6 +15,7 @@ import com.example.demo.repository.device.DeviceRepository;
 import com.example.demo.repository.user.UserRepository;
 import com.example.demo.service.auth.AuthenticationService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,9 +72,18 @@ public class TemperatureConfService {
         return true;
     }
 
-    public Page<EmailConfig> getListConfigEmail(int page, int pageSize){
+    public ListEmailConfigDto getListConfigEmail(int page, int pageSize, String countOnly){
         Pageable paging = PageRequest.of(page, pageSize);
-        return emailConfigRepository.findAll(paging);
+        List<EmailConfig> emailConfigs = new ArrayList<>();
+        Page<EmailConfig> emailConfigPage = emailConfigRepository.findAll(paging);
+        if (countOnly.equals("N")){
+            for (EmailConfig emailConfig :
+                    emailConfigPage) {
+                emailConfigs.add(emailConfig);
+            }
+            return new ListEmailConfigDto(emailConfigs);
+        }
+        return new ListEmailConfigDto(emailConfigPage.getTotalElements(), emailConfigPage.getTotalPages(), new ArrayList<EmailConfig>());
     }
 
 

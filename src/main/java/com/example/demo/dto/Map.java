@@ -7,6 +7,8 @@ import com.example.demo.model.device.DeviceLog;
 import com.example.demo.model.user.User;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 public class Map {
     public DeviceLogDto deviceLogDto(DeviceLog deviceLog) {
@@ -14,10 +16,10 @@ public class Map {
         
         deviceLogDto.setUserId(deviceLog.getUser().getId());
         deviceLogDto.setName(deviceLog.getUser().getName());
-        deviceLogDto.setTimestamp(deviceLog.getTimestamp());
         deviceLogDto.setDeviceId(deviceLog.getDevice().getId());
         deviceLogDto.setLocation(deviceLog.getDevice().getLocation());
-        deviceLogDto.setTemperature(deviceLog.getTemperature());        
+        deviceLogDto.setTemperature(deviceLog.getTemperature());
+        deviceLogDto.setDate(new Date(deviceLog.getTimestamp()));
         
         return deviceLogDto;
     }

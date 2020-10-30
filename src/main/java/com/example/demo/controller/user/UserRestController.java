@@ -1,5 +1,6 @@
 package com.example.demo.controller.user;
 
+import com.example.demo.dto.user.ListUserDto;
 import com.example.demo.dto.user.LoginDto;
 import com.example.demo.dto.user.RegisterDto;
 import com.example.demo.dto.user.UserDto;
@@ -53,8 +54,14 @@ public class UserRestController {
     }
 
     @RequestMapping(value = "list", method = RequestMethod.GET)
-    public List<UserDto> getList(@RequestParam(name = "page", required = false, defaultValue = "0") int pageIndex,
-                                 @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize) {
-        return userService.getListUser(pageIndex,pageSize);
+    public ListUserDto getList(@RequestParam(name = "page", required = false, defaultValue = "0") int pageIndex,
+                               @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize,
+                               @RequestParam(name = "countOnly", required = false, defaultValue = "N") String countOnly) {
+        return userService.getListUser(pageIndex, pageSize, countOnly);
+    }
+
+    @RequestMapping(value = "count", method = RequestMethod.GET)
+    public long count() {
+        return userService.countUser();
     }
 }

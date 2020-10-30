@@ -1,23 +1,33 @@
 package com.example.demo.dto.device;
 
+import java.util.Date;
+
 public class DeviceLogDto {
-	
-    private String userId;    
+
+    private String userId;
     private String name;
     private int temperature;
-    private Long timestamp;
     private String deviceId;
-    private String location;   
+    private String location;
+    private Date date;
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
 
     public String getName() {
-		return name;
-	}
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public int getTemperature() {
+    public int getTemperature() {
         return temperature;
     }
 
@@ -25,35 +35,29 @@ public class DeviceLogDto {
         this.temperature = temperature;
     }
 
-    public Long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Long timestamp) {
-        this.timestamp = timestamp;
-    }
-
     public String getUserId() {
-		return userId;
-	}
+        return userId;
+    }
 
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-	
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     public String getDeviceId() {
-		return deviceId;
-	}
+        return deviceId;
+    }
 
-	public void setDeviceId(String deviceId) {
-		this.deviceId = deviceId;
-	}
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
 
-	public String getLocation() {
+    public String getLocation() {
         return location;
     }
 
     public void setLocation(String location) {
         this.location = location;
     }
+
+
 }
