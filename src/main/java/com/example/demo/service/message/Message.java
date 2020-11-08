@@ -4,8 +4,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class Message {
-	
-	
     public final static String LOGIN_SUCCESS = "Login success";
     public final static String LOGIN_FAILURE = "Login failure";
     public final static int HTTP_OK = 200;
@@ -22,7 +20,4 @@ public class Message {
     public final static String ALERT_TEMPERATURE = " is higher than config temperature: ";
     public final static String SUBMIT_FAILURE = "SUBMIT_FAILURE";
     public final static String MISS_INFORMATION = "PLEASE INPUT FILL FULL INFORMATION";
-    
-    
-    
 }

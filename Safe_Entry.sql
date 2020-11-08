@@ -4,7 +4,7 @@ use safe_entry;
 create table user (
 	id varchar(256) primary key  not null,
     username varchar(256) unique,
-    name varchar(256),	
+    name varchar(256),
     email varchar(256) not null,
     password varchar(256)
 );
@@ -62,6 +62,6 @@ create table device_log (
     timestamp bigint,
 	FOREIGN KEY (device_id) REFERENCES device(id),
     FOREIGN KEY (user_id) REFERENCES user(id),
-    CONSTRAINT constraint_usertimestamp 
-	UNIQUE(user_id,timestamp)    
+    CONSTRAINT constraint_usertimestamp
+	UNIQUE(user_id,timestamp)
 );

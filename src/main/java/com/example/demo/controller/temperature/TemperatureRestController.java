@@ -1,14 +1,10 @@
 package com.example.demo.controller.temperature;
 
-
 import com.example.demo.dto.temperature.ListEmailConfigDto;
 import com.example.demo.dto.temperature.TemperatureConfigDto;
-import com.example.demo.model.conf.EmailConfig;
 import com.example.demo.service.device.TemperatureConfService;
 import com.example.demo.service.message.Message;
 import com.example.demo.service.message.ResponseMessage;
-
-import org.springframework.data.domain.Page;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -26,10 +22,12 @@ public class TemperatureRestController {
     }
 
     @RequestMapping(value = "config", method = RequestMethod.POST)
-    public Object config(HttpServletResponse response, @Validated @RequestBody TemperatureConfigDto temperatureConfigDto, BindingResult result) {
+    public Object config(HttpServletResponse response,
+            @Validated @RequestBody TemperatureConfigDto temperatureConfigDto, BindingResult result) {
         if (result.hasErrors()) {
 
-            ResponseMessage reMessage = new ResponseMessage(HttpServletResponse.SC_BAD_REQUEST, Message.MISS_INFORMATION);
+            ResponseMessage reMessage = new ResponseMessage(HttpServletResponse.SC_BAD_REQUEST,
+                    Message.MISS_INFORMATION);
             return reMessage;
         }
 
@@ -44,8 +42,8 @@ public class TemperatureRestController {
 
     @RequestMapping(value = "config/list", method = RequestMethod.GET)
     public ListEmailConfigDto getList(@RequestParam(name = "page", required = false, defaultValue = "0") int pageIndex,
-                                      @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize,
-                                      @RequestParam(name = "countOnly", required = false, defaultValue = "N") String countOnly) {
-        return temperatureConfService.getListConfigEmail(pageIndex,pageSize, countOnly);
+            @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize,
+            @RequestParam(name = "countOnly", required = false, defaultValue = "N") String countOnly) {
+        return temperatureConfService.getListConfigEmail(pageIndex, pageSize, countOnly);
     }
 }

@@ -16,23 +16,21 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
 
-
 @Service
 public class AuthenticationService {
-	
+
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final RsaUtil rsaUtil;
 
     @Autowired
-    public AuthenticationService(UserRepository userRepository, UserRoleRepository userRoleRepository, RoleRepository roleRepository, BCryptPasswordEncoder passwordEncoder, RsaUtil rsaUtil) {
+    public AuthenticationService(UserRepository userRepository, UserRoleRepository userRoleRepository,
+            RoleRepository roleRepository, BCryptPasswordEncoder passwordEncoder, RsaUtil rsaUtil) {
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
-        this.rsaUtil = rsaUtil;
 
     }
 
@@ -40,8 +38,8 @@ public class AuthenticationService {
         return userRepository.findUserByUsername(username) != null;
     }
 
-    public String hasRole(HttpSession session){
-        if (session.getAttribute(Message.ROLE).equals(Message.ROLE_ADMIN)){
+    public String hasRole(HttpSession session) {
+        if (session.getAttribute(Message.ROLE).equals(Message.ROLE_ADMIN)) {
             return Message.ROLE_ADMIN;
         }
         return Message.ROLE_USER;
@@ -67,12 +65,12 @@ public class AuthenticationService {
         return false;
     }
 
-    public boolean checkLogin(HttpSession session){
+    public boolean checkLogin(HttpSession session) {
         return session.getAttribute(Message.USER_ID) != null;
     }
 
-    public boolean register(RegisterDto registerDto){
-        if (userRepository.findUserByUsername(registerDto.getUsername()) != null){
+    public boolean register(RegisterDto registerDto) {
+        if (userRepository.findUserByUsername(registerDto.getUsername()) != null) {
             return false;
         }
         String passwordEncrypt = passwordEncoder.encode(registerDto.getPassword());

@@ -3,7 +3,7 @@ package com.example.demo.service.message;
 public class ResponseMessage {
 
 	public int statusCode;
-	
+
 	public String message;
 
 	public int getStatusCode() {
@@ -22,22 +22,13 @@ public class ResponseMessage {
 		this.message = message;
 	}
 
-	public ResponseMessage(int statusCode, String message) {		
+	public ResponseMessage(int statusCode, String message) {
 		this.statusCode = statusCode;
 		this.message = message;
 	}
 
 	public ResponseMessage() {
-		
+
 	}
-
-	
-
-	
-	
-	
-	
-
-	
 
 }

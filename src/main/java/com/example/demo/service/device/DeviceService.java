@@ -48,9 +48,9 @@ public class DeviceService {
 
     @Autowired
     public DeviceService(DeviceRepository deviceRepository, AuthenticationService authenticationService,
-                         UserRepository userRepository, DeviceLogRepository deviceLogRepository, Map map,
-                         UserCardRepository userCardRepository, TemperatureRepository temperatureRepository,
-                         EmailConfigRepository emailConfigRepository, JavaMailSender javaMailSender) {
+            UserRepository userRepository, DeviceLogRepository deviceLogRepository, Map map,
+            UserCardRepository userCardRepository, TemperatureRepository temperatureRepository,
+            EmailConfigRepository emailConfigRepository, JavaMailSender javaMailSender) {
         this.deviceRepository = deviceRepository;
         this.userRepository = userRepository;
         this.deviceLogRepository = deviceLogRepository;
@@ -64,8 +64,8 @@ public class DeviceService {
     public boolean submitLog(DeviceLogSubmitDto deviceLogSubmitDto) {
         SimpleMailMessage msg = new SimpleMailMessage();
         int max_temperature = temperatureRepository.findById(1).getTemperature();
-        if (deviceRepository.findDeviceById(deviceLogSubmitDto.getDeviceId()) == null ||
-                userRepository.findUserById(deviceLogSubmitDto.getUserId()) == null) {
+        if (deviceRepository.findDeviceById(deviceLogSubmitDto.getDeviceId()) == null
+                || userRepository.findUserById(deviceLogSubmitDto.getUserId()) == null) {
             return false;
         }
         DeviceLog deviceLog = new DeviceLog();
@@ -86,15 +86,18 @@ public class DeviceService {
                 msg.setTo(email);
                 msg.setSubject("Alert Temperature");
                 msg.setText(userRepository.findUserById(deviceLogSubmitDto.getUserId()).getName()
-                        + " have current temperature " + deviceLogSubmitDto.getTemperature() + Message.ALERT_TEMPERATURE + " " + max_temperature);
+                        + " have current temperature " + deviceLogSubmitDto.getTemperature() + Message.ALERT_TEMPERATURE
+                        + " " + max_temperature);
                 javaMailSender.send(msg);
             }
         }
         return true;
     }
 
-    public ListDeviceLogDto getList(int page, int pageSize, Long fromTimestamp, Long toTimestamp, String name, String email,
-                                    int temperature, String filterOnly, String sortByTemperature, String sortByDate, String countOnly) {
+    public ListDeviceLogDto getList(int page, int pageSize, Long fromTimestamp, Long toTimestamp, String name,
+            String email, int temperature, String filterOnly, String sortByTemperature, String sortByDate,
+            String countOnly) {
+        System.out.println("timestamp: " + fromTimestamp + " " + toTimestamp);
         List<DeviceLogDto> deviceLogDtoList = new ArrayList<>();
         Pageable paging = getPage(sortByTemperature, sortByDate, page, pageSize);
         Page<DeviceLog> deviceLogPage = null;
@@ -105,41 +108,44 @@ public class DeviceService {
             User user = userRepository.findUserByNameAndEmail(name, email);
             if (user != null) {
                 if (fromTimestamp != 0 && toTimestamp != 0) {
-                    deviceLogPage = deviceLogRepository.findByUserIdAndTemperatureAndTimestampGreaterThanEqualAndTimestampLessThanEqual(user.getId(), temperature, fromTimestamp, toTimestamp, paging);
+                    deviceLogPage = deviceLogRepository
+                            .findByUserIdAndTemperatureAndTimestampGreaterThanEqualAndTimestampLessThanEqual(
+                                    user.getId(), temperature, fromTimestamp, toTimestamp, paging);
                 }
                 if (fromTimestamp == 0 || toTimestamp == 0) {
                     if (temperature == 0) {
                         deviceLogPage = deviceLogRepository.findByUserId(user.getId(), paging);
                     } else {
-                        deviceLogPage = deviceLogRepository.findByUserIdAndTemperature(user.getId(), temperature, paging);
+                        deviceLogPage = deviceLogRepository.findByUserIdAndTemperature(user.getId(), temperature,
+                                paging);
                     }
                 }
             } else {
-                if (temperature != 0 && (name == null || name.equals("undefined")) && (email == null || email.equals("undefined"))){
-                    deviceLogPage = deviceLogRepository.findByTemperature(temperature,paging);
-                    for (DeviceLog deviceLog :
-                            deviceLogPage) {
+                if (temperature != 0 && (name == null || name.equals("undefined"))
+                        && (email == null || email.equals("undefined"))) {
+                    deviceLogPage = deviceLogRepository.findByTemperature(temperature, paging);
+                    for (DeviceLog deviceLog : deviceLogPage) {
                         deviceLogDtoList.add(map.deviceLogDto(deviceLog));
                     }
                     if (countOnly.equals("N")) {
                         return new ListDeviceLogDto(deviceLogDtoList);
                     }
-                    return new ListDeviceLogDto(deviceLogPage.getTotalElements(),deviceLogPage.getTotalPages(), new ArrayList<DeviceLogDto>());
+                    return new ListDeviceLogDto(deviceLogPage.getTotalElements(), deviceLogPage.getTotalPages(),
+                            new ArrayList<DeviceLogDto>());
                 }
                 return new ListDeviceLogDto(deviceLogDtoList);
             }
         }
         if (deviceLogPage != null) {
-            for (DeviceLog deviceLog :
-                    deviceLogPage) {
+            for (DeviceLog deviceLog : deviceLogPage) {
                 deviceLogDtoList.add(map.deviceLogDto(deviceLog));
             }
             if (countOnly.equals("N")) {
                 return new ListDeviceLogDto(deviceLogDtoList);
             }
             deviceLogDtoList.clear();
-
-            return new ListDeviceLogDto(deviceLogPage.getTotalElements(),deviceLogPage.getTotalPages(), new ArrayList<DeviceLogDto>());
+            return new ListDeviceLogDto(deviceLogPage.getTotalElements(), deviceLogPage.getTotalPages(),
+                    new ArrayList<DeviceLogDto>());
         }
         return new ListDeviceLogDto(deviceLogDtoList);
     }
@@ -155,13 +161,14 @@ public class DeviceService {
         return Date.from(dateToConvert.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
     }
 
-
-    public List<UserTemperature> getListByTimeInterval(String userId, Long fromTimestamp, Long toTimestamp, int page, int pageSize) {
+    public List<UserTemperature> getListByTimeInterval(String userId, Long fromTimestamp, Long toTimestamp, int page,
+            int pageSize) {
         List<UserTemperature> userTemperatureList = new ArrayList<>();
         Pageable paging = PageRequest.of(page, pageSize, Sort.by("timestamp").descending());
-        Page<DeviceLog> deviceLogList = deviceLogRepository.findByUserIdAndTimestampGreaterThanEqualAndTimestampLessThanEqual(userId, fromTimestamp, toTimestamp, paging);
-        for (DeviceLog deviceLog :
-                deviceLogList) {
+        Page<DeviceLog> deviceLogList = deviceLogRepository
+                .findByUserIdAndTimestampGreaterThanEqualAndTimestampLessThanEqual(userId, fromTimestamp, toTimestamp,
+                        paging);
+        for (DeviceLog deviceLog : deviceLogList) {
             userTemperatureList.add(map.userTemperature(deviceLog));
         }
         return userTemperatureList;
@@ -177,7 +184,7 @@ public class DeviceService {
             }
             return new ListDevice(deviceList);
         }
-        return new ListDevice(devicePage.getTotalElements(),devicePage.getTotalPages(), new ArrayList<Device>());
+        return new ListDevice(devicePage.getTotalElements(), devicePage.getTotalPages(), new ArrayList<Device>());
     }
 
     public Long countDevice() {

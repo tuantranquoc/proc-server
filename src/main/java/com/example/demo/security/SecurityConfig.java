@@ -7,15 +7,15 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Configuration
-public class SecurityConfig extends WebSecurityConfigurerAdapter  {
-	
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
     @Bean
     public BCryptPasswordEncoder encoderPWM() {
         return new BCryptPasswordEncoder();
     }
+
     @Override
-    protected void configure(HttpSecurity security) throws Exception
-    {
+    protected void configure(HttpSecurity security) throws Exception {
         security.csrf().disable();
         security.httpBasic().disable();
     }
